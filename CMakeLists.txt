@@ -8,6 +8,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 
 
-add_executable(opengl "window.cpp" "../glad/src/glad.c" "glfw_context.h")
+add_executable(opengl "window.cpp" "../glad/src/glad.c" "glfw_context.h" "vbo.h" "gl_shaders.h" "gl_simple_shader.h")
 target_include_directories(opengl PRIVATE "../glad/include" "../glad/src/" "../glfw/include/")
 target_link_libraries(opengl glfw3 GL X11 pthread Xrandr Xi dl)

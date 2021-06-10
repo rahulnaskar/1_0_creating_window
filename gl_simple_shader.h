@@ -11,8 +11,23 @@ class gl_simple_shader: public gl_base_shader {
 			glGetShaderInfoLog(shader, sizeof(info_log), NULL, info_log);
 			std::cerr << "Error in creating shader, " << p_shader_type << "," << info_log;
 		}
+		else {
+			std::cout << "Shader created successfully" << std::endl;
+		}
 		
 	
+	}
+	int gl_shader_attach(unsigned int& shader_program) {
+		glAttachShader(shader_program, shader);
+		glLinkProgram(shader_program);
+		int success {0};
+		glGetProgramiv(shader_program, GL_LINK_STATUS, &success);
+		if (!success) {
+			glGetProgramInfoLog(shader_program, 512, NULL, info_log);
+			std::cout << "Error occurred," << info_log << std::endl;
+		}
+		glDeleteShader(shader);
+		return success;
 	}
 	virtual unsigned int gl_shader() {
 		return shader;	

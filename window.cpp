@@ -48,12 +48,15 @@ int main() {
 	glGenVertexArrays(1, &VAO1);
 	glBindVertexArray(VAO1);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * 0, (void *) 0);
+	glEnableVertexAttribArray(0);
+
 	
 	uint VAO2;
 	glGenVertexArrays(1, &VAO2);
 	glBindVertexArray(VAO2);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * 0, (void *) 36);
 	
+
 	glEnableVertexAttribArray(0);
 	//glEnableVertexAttribArray(1);
 

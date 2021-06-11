@@ -6,7 +6,6 @@
 constexpr int window_width = 800;
 constexpr int window_height = 600;
 
-using uint = unsigned int;
 
 const char * vertex_shader_source = 	"#version 330 core\n"
 				"layout (location = 0) in vec3 apos;\n"
@@ -42,16 +41,19 @@ int main() {
 		1.0f, -0.5f, 0.0f,
 	};
 
-	uint VAO1;
-	glGenVertexArrays(1, &VAO1);
-	
-	glBindVertexArray(VAO1);
-
 	gl_vbo vbo(GL_ARRAY_BUFFER);
 	vbo.gl_vbo_set_data(vertices, sizeof(vertices), GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *) 0);
-
+	uint VAO1;
+	glGenVertexArrays(1, &VAO1);
+	glBindVertexArray(VAO1);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * 0, (void *) 0);
+	
+	uint VAO2;
+	glGenVertexArrays(1, &VAO2);
+	glBindVertexArray(VAO2);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * 0, (void *) 36);
+	
 	glEnableVertexAttribArray(0);
 	//glEnableVertexAttribArray(1);
 
@@ -66,12 +68,13 @@ int main() {
 			glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
 			glUseProgram(shader_program);
-			glBindVertexArray(VAO1);
 			if (x % 2 == 0) {
-				glDrawArrays(GL_TRIANGLES, 0, 3);
+			glBindVertexArray(VAO1);
+			glDrawArrays(GL_TRIANGLES, 0, 3);
 			}
 			else {
-				glDrawArrays(GL_TRIANGLES, 3, 3);
+			glBindVertexArray(VAO2);
+			glDrawArrays(GL_TRIANGLES, 0, 3);
 			}
 			glfwSwapBuffers(window);
 			glfwPollEvents();

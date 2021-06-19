@@ -7,7 +7,8 @@ class gl_vbo {
 		glGenBuffers(1, &vbo);
 		glBindBuffer(buff_type, vbo);
 	}
-	bool gl_vbo_set_data(float data[], size_t sz,  GLenum p_draw_type) {
+  template<typename T>
+	bool gl_vbo_set_data(T data[], size_t sz,  GLenum p_draw_type) {
 		glBufferData(buff_type, sz, data, p_draw_type);
 		return true;
 	}

@@ -23,7 +23,7 @@ out vec4 vertex_colors;
 void main() {
 vertex_colors = apos;
 
-gl_Position = transformaxisx * transformaxisz * vec4(apos.x, apos.y, apos.z, apos.w);
+gl_Position = (transformaxisx * transformaxisz) * vec4(apos.x, apos.y, apos.z, apos.w);
 //gl_Position = vec4(bpos.x, bpos.y, bpos.z, 1.0f);
 })";
 const char * fragment_shader_source = "#version 330 core\n"
@@ -117,9 +117,10 @@ int main() {
   float i = 0.0f;
   if (nullptr != window) {
     int x {0};
+
     while (false == gwm.should_close()) {
 
-
+        glfw_context_window::update_key_map(window);
       x += 1;
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT);
@@ -133,7 +134,7 @@ int main() {
 
 
       matrix_z = glm::rotate(matrix_z, radians(i), glm::vec3(0.0f, 0.0f, 1.0f));
-      matrix_x = glm::rotate(matrix_x, radians(1.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+      matrix_x = glm::rotate(matrix_x, radians(.1f), glm::vec3(0.0f, 1.0f, 0.0f));
       //matrix_x = glm::rotate(matrix_x, radians(1.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
 
@@ -149,7 +150,7 @@ int main() {
 
       glfwSwapBuffers(window);
       glfwPollEvents();
-      i += 0.001f;
+      i = i + 0.001f;
     }
   }
 

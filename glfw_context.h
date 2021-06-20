@@ -7,6 +7,12 @@ namespace glfw_context_window {
 	void framebuffer_size_callback(GLFWwindow * win, int width, int height) { 
 		glViewport(0, 0, width, height);
 	}
+	bool update_key_map(GLFWwindow* win) {
+		if (glfwGetKey(win, GLFW_KEY_LEFT) == GLFW_PRESS) {
+			std::cout << "Left key pressed" << std::endl;
+		}
+		return true;
+	}
 	class glfw_win_manager {
 		GLFWwindow * window {nullptr};
 		void process_input(GLFWwindow * win) {

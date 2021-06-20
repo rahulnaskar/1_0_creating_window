@@ -13,25 +13,30 @@ constexpr int window_width = 800;
 constexpr int window_height = 600;
 
 
-const char* vertex_shader_source = R"(
+const char* vertex_shader_source = R"GLSL(
 #version 330 core
 layout (location = 0) in vec4 apos;
+layout (location = 1) in vec4 acol;
 
 uniform mat4 transformaxisz;
 uniform mat4 transformaxisx;
 out vec4 vertex_colors;
 void main() {
-vertex_colors = apos;
+  vertex_colors = acol;
 
-gl_Position = transformaxisx * transformaxisz * vec4(apos.x, apos.y, apos.z, apos.w);
-//gl_Position = vec4(bpos.x, bpos.y, bpos.z, 1.0f);
-})";
-const char * fragment_shader_source = "#version 330 core\n"
-                                      "in vec4 vertex_colors;"
-                                      "out vec4 frag_color;\n"
+  gl_Position = transformaxisx * transformaxisz * vec4(apos.x, apos.y, apos.z, apos.w);
+  //gl_Position = vec4(bpos.x, bpos.y, bpos.z, 1.0f);
+}
+)GLSL";
+const char * fragment_shader_source = R"GLSL(
+#version 330 core
+in vec4 vertex_colors;
+out vec4 frag_color;
                                        
-                                      "void main() {\n"
-                                      "frag_color = vec4(vertex_colors.x, vertex_colors.y, vertex_colors.z, 1.0f);\n}\0";
+void main() {
+  frag_color = vertex_colors;
+}
+)GLSL";
 
 constexpr double MM_PI = 3.14159265358979323846;  /* pi */
 
@@ -59,14 +64,28 @@ int main() {
   glm::mat4 m1 = glm::scale(glm::mat4(2.0f), v3);
   //std::cout << m1.x << "," << m1.y << "," << m1.z << std::endl;
 
-  glm::vec4 lines[] = {
-    {0.0f, 0.0f, 0.0f, 1.0f},
-    {1.0f, 0.0f, 0.0f, 1.0f},
-    {0.0f, 0.0f, 0.0f, 1.0f},
-    {0.0f, 1.0f, 0.0f, 1.0f},
-    {0.0f, 0.0f, 0.0f, 1.0f},
-    {0.00f, 0.0f, 1.0f, 1.0f}
-  };
+  #pragma pack(push, 1)
+  struct attribs {
+    glm::vec4 lines[6];
+    glm::vec4 colors[6];
+    
+    attribs() : lines {
+        {0.0f, 0.0f, 0.0f, 1.0f},
+        {1.0f, 0.0f, 0.0f, 1.0f},
+        {0.0f, 0.0f, 0.0f, 1.0f},
+        {0.0f, 1.0f, 0.0f, 1.0f},
+        {0.0f, 0.0f, 0.0f, 1.0f},
+        {0.00f, 0.0f, 1.0f, 1.0f}
+      }, colors {
+        {1.0f, 0.0f, 0.0f, 1.0f},
+        {1.0f, 0.0f, 0.0f, 1.0f},
+        {0.0f, 1.0f, 0.0f, 1.0f},
+        {0.0f, 1.0f, 0.0f, 1.0f},
+        {0.0f, 0.0f, 1.0f, 1.0f},
+        {0.00f, 0.0f, 1.0f, 1.0f}
+      } {}
+  } attrs;
+  #pragma pack(pop)
 
 
   float vertices[] = {
@@ -80,17 +99,20 @@ int main() {
 
 //  lines[1] = matrix_2 * lines[1];
   gl_vbo vbo_base_lines(GL_ARRAY_BUFFER);
-  vbo_base_lines.gl_vbo_set_data(lines, sizeof(lines), GL_STATIC_DRAW);
+  vbo_base_lines.gl_vbo_set_data(&attrs, sizeof(attrs), GL_STATIC_DRAW);
 
   uint VAOBase;
   glGenVertexArrays(1, &VAOBase);
   glBindVertexArray(VAOBase);
-  glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (void *) 0);
+  glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const void *>(reinterpret_cast<const char *>(&attrs.lines) - reinterpret_cast<const char *>(&attrs)));
+  glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const void *>(reinterpret_cast<const char *>(&attrs.colors) - reinterpret_cast<const char *>(&attrs)));
   glEnableVertexAttribArray(0);
+  glEnableVertexAttribArray(1);
 
   gl_vbo vbo(GL_ARRAY_BUFFER);
   vbo.gl_vbo_set_data(vertices, sizeof(vertices), GL_STATIC_DRAW);
 
+#if 0
   uint VAO1;
   glGenVertexArrays(1, &VAO1);
   glBindVertexArray(VAO1);
@@ -103,6 +125,7 @@ int main() {
   glGenVertexArrays(1, &VAO2);
   glBindVertexArray(VAO2);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 1, (void *) 36);
+#endif
 
 
   glEnableVertexAttribArray(0);

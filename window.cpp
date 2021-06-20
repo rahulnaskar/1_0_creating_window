@@ -64,7 +64,6 @@ int main() {
   glm::mat4 m1 = glm::scale(glm::mat4(2.0f), v3);
   //std::cout << m1.x << "," << m1.y << "," << m1.z << std::endl;
 
-  #pragma pack(push, 1)
   struct attribs {
     glm::vec4 lines[6];
     glm::vec4 colors[6];
@@ -85,7 +84,6 @@ int main() {
         {0.00f, 0.0f, 1.0f, 1.0f}
       } {}
   } attrs;
-  #pragma pack(pop)
 
 
   float vertices[] = {
@@ -137,13 +135,31 @@ int main() {
 
   glm::mat4 matrix_z = glm::mat4(1.0);
   glm::mat4 matrix_x = glm::mat4(1.0);
-  float i = 0.0f;
+  
+  glm::ivec3 acceleration(0);
+
   if (nullptr != window) {
-    int x {0};
+
+    glfwSetWindowUserPointer(window, &acceleration);
+    glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+      glm::ivec3 *acceleration = static_cast<glm::ivec3 *>(glfwGetWindowUserPointer(window));
+      switch(key) {
+      case GLFW_KEY_A:
+        ++acceleration->z;
+        break;
+      case GLFW_KEY_D:
+        --acceleration->z;
+        break;
+      case GLFW_KEY_W:
+        ++acceleration->x;
+        break;
+      case GLFW_KEY_S:
+        --acceleration->x;
+        break;
+      }
+    });
+
     while (false == gwm.should_close()) {
-
-
-      x += 1;
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT);
 
@@ -155,8 +171,8 @@ int main() {
       //std::cout << "Transformer location, " << sl_transformer_z << std::endl;
 
 
-      matrix_z = glm::rotate(matrix_z, radians(i), glm::vec3(0.0f, 0.0f, 1.0f));
-      matrix_x = glm::rotate(matrix_x, radians(1.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+      matrix_z = glm::rotate(matrix_z, radians(0.1f * acceleration.z), glm::vec3(0.0f, 0.0f, 1.0f));
+      matrix_x = glm::rotate(matrix_x, radians(0.1f * acceleration.x), glm::vec3(1.0f, 0.0f, 0.0f));
       //matrix_x = glm::rotate(matrix_x, radians(1.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
 
@@ -172,7 +188,6 @@ int main() {
 
       glfwSwapBuffers(window);
       glfwPollEvents();
-      i += 0.001f;
     }
   }
 

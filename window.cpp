@@ -1,7 +1,7 @@
 #include "glfw_context.h"
 #include "vbo.h"
 #include "gl_simple_shader.h"
-#include <unistd.h>
+//#include <unistd.h>
 #include <cmath>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -13,25 +13,31 @@ constexpr int window_width = 800;
 constexpr int window_height = 600;
 
 
-const char * vertex_shader_source = 	"#version 330 core\n"
-                                        "layout (location = 0) in vec4 apos;\n"
-                                        "layout (location = 1) in vec4 bpos;\n"
-                                        "uniform mat4 transformaxisz;"
-                                        //                                        "uniform mat4 transformaxisx;"
-                                        "void main() {\n"
-                                        "gl_Position = transformaxisz * vec4(apos.x, apos.y, apos.z, apos.w);\n"
-                                        //"gl_Position = vec4(bpos.x, bpos.y, bpos.z, 1.0f);\n"
-                                        "}\0";
+const char* vertex_shader_source = R"(
+#version 330 core
+layout (location = 0) in vec4 apos;
+
+uniform mat4 transformaxisz;
+uniform mat4 transformaxisx;
+out vec4 vertex_colors;
+void main() {
+vertex_colors = apos;
+
+gl_Position = transformaxisx * transformaxisz * vec4(apos.x, apos.y, apos.z, apos.w);
+//gl_Position = vec4(bpos.x, bpos.y, bpos.z, 1.0f);
+})";
 const char * fragment_shader_source = "#version 330 core\n"
+                                      "in vec4 vertex_colors;"
                                       "out vec4 frag_color;\n"
+                                       
                                       "void main() {\n"
-                                      "frag_color = vec4(0.2f, 1.0f, 0.4f, 1.0f);\n}\0";
+                                      "frag_color = vec4(vertex_colors.x, vertex_colors.y, vertex_colors.z, 1.0f);\n}\0";
 
 constexpr double MM_PI = 3.14159265358979323846;  /* pi */
 
 constexpr float radians(float x) {return x * MM_PI / 180.0f;}
 constexpr float degrees(float x) {return x * 180.0f / MM_PI;}
-constexpr float hypotenuse(float x, float y) {return sqrt(x * x + y * y);}
+float hypotenuse(float x, float y) {return std::sqrt(x * x + y * y);}
 
 int main() {
   glfw_context_window::glfw_win_manager gwm;
@@ -121,12 +127,13 @@ int main() {
       glUseProgram(shader_program);
 
       unsigned int sl_transformer_z = glGetUniformLocation(shader_program, "transformaxisz");
-      //unsigned int sl_transformer_x = glGetUniformLocation(shader_program, "transformaxisx");
+      unsigned int sl_transformer_x = glGetUniformLocation(shader_program, "transformaxisx");
       //std::cout << "Transformer location, " << sl_transformer_x << std::endl;
       //std::cout << "Transformer location, " << sl_transformer_z << std::endl;
 
 
       matrix_z = glm::rotate(matrix_z, radians(i), glm::vec3(0.0f, 0.0f, 1.0f));
+      matrix_x = glm::rotate(matrix_x, radians(1.0f), glm::vec3(1.0f, 0.0f, 0.0f));
       //matrix_x = glm::rotate(matrix_x, radians(1.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
 
@@ -134,6 +141,7 @@ int main() {
       //unsigned int sl_transformer_x= glGetUniformLocation(shader_program, "transformaxisx");
 
       glUniformMatrix4fv(sl_transformer_z, 1, GL_FALSE, glm::value_ptr(matrix_z));
+      glUniformMatrix4fv(sl_transformer_x, 1, GL_FALSE, glm::value_ptr(matrix_x));
       //glUniformMatrix4fv(sl_transformer_x, 1, GL_FALSE, glm::value_ptr(matrix_x));
       glBindVertexArray(VAOBase);
 
@@ -141,7 +149,7 @@ int main() {
 
       glfwSwapBuffers(window);
       glfwPollEvents();
-      i += 0.01f;
+      i += 0.001f;
     }
   }
 

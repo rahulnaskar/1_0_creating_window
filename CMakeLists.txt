@@ -5,7 +5,7 @@ project(opengl)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(glfw3_DIR "C:/Program Files (x86)/GLFW/lib/cmake/glfw3")
+set(glfw3_DIR "C:/Program Files/GLFW/lib/cmake/glfw3")
 
 find_package(glfw3 3.3 REQUIRED)
 find_package(OpenGL REQUIRED)
